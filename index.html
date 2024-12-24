@@ -3,9 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thrive - Volunteer Registration</title>
-    <link rel="shortcut icon" href="THRIVE POVERTY ERADICATION (2).jpg" type="image/svg+xml">
+  <title>Volunteer Registration</title>
   <style>
+    
+::-webkit-scrollbar { width: 5px; }
+
+::-webkit-scrollbar-track { background-color: transparent; }
+
+::-webkit-scrollbar-thumb {
+  background-color: orange;
+  border-radius: var(--radius-pill);
+}
+
     body {
       font-family: 'Arial', sans-serif;
       background-color: #fff6e6; /* Light orange background */
@@ -76,6 +85,20 @@
       color: red;
       text-align: center;
     }
+    @media (max-width: 768px) {
+  h1 {
+    font-size: 2rem; /* Smaller font size for tablets */
+    padding: 10px;
+  }
+}
+
+/* Media query for very small screens (e.g., mobile phones) */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem; /* Even smaller font size for phones */
+    padding: 5px;
+  }
+}
   </style>
 </head>
 <body>
@@ -113,7 +136,7 @@
   <script>
     const form = document.getElementById('volunteerForm');
     const responseMessage = document.getElementById('responseMessage');
-    const apiBaseUrl = "https://thrive-registration.onrender.com"; // Update with your back-end URL.
+    const apiBaseUrl = "http://localhost:5000"; // Update with your back-end URL.
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
