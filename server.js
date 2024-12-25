@@ -1,6 +1,9 @@
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 5000;
@@ -9,17 +12,32 @@ const port = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// In-memory storage for simplicity (using an array)
-const volunteers = [];
+// Path to the JSON file where data will be stored
+const volunteersFilePath = path.join(__dirname, 'volunteers.json');
+
+// Helper function to read data from the JSON file
+function readVolunteersFromFile() {
+  if (fs.existsSync(volunteersFilePath)) {
+    const data = fs.readFileSync(volunteersFilePath, 'utf8');
+    return JSON.parse(data);
+  }
+  return [];
+}
+
+// Helper function to write data to the JSON file
+function writeVolunteersToFile(volunteers) {
+  fs.writeFileSync(volunteersFilePath, JSON.stringify(volunteers, null, 2), 'utf8');
+}
 
 // Route to get all volunteers (optional, for debugging)
 app.get('/volunteers', (req, res) => {
+  const volunteers = readVolunteersFromFile();
   res.json(volunteers);
 });
 
 // Route to register a volunteer
 app.post('/volunteers', (req, res) => {
-  const { name, ageGroup, email, phone, whyJoining } = req.body;
+  const { name, email, phone, ageGroup, whyJoining } = req.body;
 
   // Validate required fields
   if (!name || !email || !phone || !ageGroup || !whyJoining) {
@@ -32,14 +50,22 @@ app.post('/volunteers', (req, res) => {
     return res.status(400).json({ message: 'Invalid age group selected.' });
   }
 
+  // Read existing volunteers from the file
+  const volunteers = readVolunteersFromFile();
+
   // Check for duplicate email or phone number
   const existingVolunteer = volunteers.find(volunteer => volunteer.email === email || volunteer.phone === phone);
   if (existingVolunteer) {
     return res.status(400).json({ message: 'You have already registered with this email or phone number.' });
   }
 
-  // Save the new volunteer
-  volunteers.push({ name, ageGroup, email, phone, whyJoining, date: new Date() });
+  // Create new volunteer and add to the list
+  const newVolunteer = { name, email, phone, ageGroup, whyJoining, date: new Date() };
+  volunteers.push(newVolunteer);
+
+  // Write the updated volunteers list to the file
+  writeVolunteersToFile(volunteers);
+
   res.status(201).json({ message: 'Registration successful!' });
 });
 
